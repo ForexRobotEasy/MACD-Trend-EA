@@ -1,0 +1,117 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                MACD Trend EA.mq5 |
+//|                      Copyright 2022, forexroboteasy.com           |
+//|                                         Developed by Forex Robot  |
+//|                                                              Easy Team|
+//+------------------------------------------------------------------+
+#property link      'https://www.forexroboteasy.com'
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Add initialization code here
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Add deinitialization code here
+}
+
+//+------------------------------------------------------------------+
+//| Expert start function                                            |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   // Add trading logic here
+   double macdLine = iMACD(_Symbol, _Period, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 0);
+   double signalLine = iMACD(_Symbol, _Period, 12, 26, 9, PRICE_CLOSE, MODE_SIGNAL, 0);
+   double macdHist = iMACD(_Symbol, _Period, 12, 26, 9, PRICE_CLOSE, MODE_HIST, 0);
+
+   if (macdLine > signalLine)
+   {
+      // Open a buy trade
+      int ticket = OrderSend(_Symbol, OP_BUY, 0.1, Ask, 10, Bid - StopLoss * _Point, Bid + TakeProfit * _Point);
+      
+      if (ticket > 0)
+      {
+         // Set trailing stop
+         if (TrailingStop > 0)
+         {
+            OrderSelect(ticket, SELECT_BY_TICKET);
+            OrderModify(ticket, OrderOpenPrice(), OrderStopLoss(), Bid - TrailingStop * _Point, 0, Green);
+         }
+      }
+   }
+   else if (macdLine < signalLine)
+   {
+      // Open a sell trade
+      int ticket = OrderSend(_Symbol, OP_SELL, 0.1, Bid, 10, Ask + StopLoss * _Point, Ask - TakeProfit * _Point);
+      
+      if (ticket > 0)
+      {
+         // Set trailing stop
+         if (TrailingStop > 0)
+         {
+            OrderSelect(ticket, SELECT_BY_TICKET);
+            OrderModify(ticket, OrderOpenPrice(), OrderStopLoss(), Ask + TrailingStop * _Point, 0, Red);
+         }
+      }
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Custom functions                                                  |
+//+------------------------------------------------------------------+
+double NormalizeDouble(double value, int digits)
+{
+   return(MathRound(value * MathPow(10, digits)) / MathPow(10, digits));
+}
+
+//+------------------------------------------------------------------+
+//| Input parameters                                                 |
+//+------------------------------------------------------------------+
+input int FastMA = 12;               // Fast moving average period
+input int SlowMA = 26;               // Slow moving average period
+input int SignalMA = 9;              // Signal line period
+input double StopLoss = 100;         // Stop loss in points
+input double TakeProfit = 200;       // Take profit in points
+input double TrailingStop = 50;      // Trailing stop in points
+
+//+------------------------------------------------------------------+
+//| Set chart properties                                             |
+//+------------------------------------------------------------------+
+void SetChartProperties()
+{
+   // Add chart properties code here
+}
+
+//+------------------------------------------------------------------+
+//| Display trade signals on the chart                               |
+//+------------------------------------------------------------------+
+void DisplayTradeSignals()
+{
+   // Add trade signals code here
+}
+
+//+------------------------------------------------------------------+
+//| Error handling and logging                                       |
+//+------------------------------------------------------------------+
+void ErrorHandling()
+{
+   // Add error handling code here
+}
+
+//+------------------------------------------------------------------+
+//| Custom functions definitions                                     |
+//+------------------------------------------------------------------+
+// Add custom functions code here
+
+//+------------------------------------------------------------------+
